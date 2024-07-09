@@ -19,6 +19,10 @@ if (!fs.existsSync(PDF_DIR)) {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
+app.get("/", (req, res) => {
+  res.send("Backend Running!");
+});
+
 app.post("/convert", async (req, res) => {
   const { html } = req.body;
 
