@@ -24,7 +24,9 @@ app.get("/", (req, res) => {
 });
 
 app.post("/convert", async (req, res) => {
-  const { html } = req.body;
+  const html = req.body;
+
+  console.log(html);
 
   if (!html) {
     return res.status(400).json({ error: "HTML content is required" });
