@@ -17,7 +17,7 @@ if (!fs.existsSync(PDF_DIR)) {
 }
 
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(bodyParser.json());
+app.use(bodyParser.text());
 
 app.get("/", (req, res) => {
   res.send("Backend Running!");
@@ -26,22 +26,27 @@ app.get("/", (req, res) => {
 app.post("/convert", async (req, res) => {
   const html = req.body;
 
-  console.log(html);
-
   if (!html) {
     return res.status(400).json({ error: "HTML content is required" });
   }
 
   try {
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      headless: true,
+      timeout: 60000,
+    });
+
     const page = await browser.newPage();
-    await page.setContent(html);
+    await page.setContent(html, { waitUntil: "networkidle2", timeout: 60000 });
 
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
+      displayHeaderFooter: true,
     });
 
+    await page.close();
     await browser.close();
 
     const pdfId = uuidv4();
