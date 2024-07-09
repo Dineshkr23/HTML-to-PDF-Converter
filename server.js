@@ -54,7 +54,7 @@ app.post("/convert", async (req, res) => {
 
     fs.writeFileSync(pdfPath, pdfBuffer);
 
-    res.json({ url: `${req.protocol}://${req.get("host")}/pdfs/${pdfId}.pdf` });
+    res.json({ url: `${req.protocol}://${req.get("host")}/pdfs/${pdfId}` });
   } catch (error) {
     console.error("Error generating PDF:", error);
     res.status(500).json({ error: "Failed to generate PDF" });
