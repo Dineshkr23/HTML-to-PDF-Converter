@@ -67,6 +67,7 @@ const generateGoogleReviewHTML = (data) => `
         object-fit: cover;
         background-position-x: center;
         background-size: contain;
+        padding: 30px;
       }
       @media print {
         body {
@@ -75,12 +76,7 @@ const generateGoogleReviewHTML = (data) => `
           object-fit: cover;
           background-position-x: center;
           background-size: contain;
-        }
-        .page {
-          width: 21cm;
-          min-height: 29.7cm;
-          padding: 0 1cm;
-          margin: 1cm auto;
+          padding: 30px;
         }
         .footer-report {
           position: fixed;
@@ -122,12 +118,6 @@ const generateGoogleReviewHTML = (data) => `
           page-break-inside: avoid;
           page-break-after: auto;
         }
-        .report-table tbody tr:nth-child(9) {
-          page-break-before: always;
-        }
-        .report-table tbody tr:nth-child(28) {
-          page-break-before: always;
-        }
       }
       .header {
         display: flex;
@@ -144,6 +134,10 @@ const generateGoogleReviewHTML = (data) => `
         display: flex;
         align-items: center;
         justify-content: flex-end;
+      }
+      .org-image p {
+        font-size: 35px;
+        font-weight: 600;
       }
       .org-image img,
       .partner-image img {
@@ -274,6 +268,7 @@ const generateGoogleReviewHTML = (data) => `
         max-width: 95%;
       }
       .footer-report {
+        padding-top: 25px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -298,97 +293,111 @@ const generateGoogleReviewHTML = (data) => `
     </style>
   </head>
   <body>
-    <div class="page">
-      <div class="container">
-        <div class="header">
-          <div class="org-image">
-            <img id="orgLogo" src="${data.orgLogo}" alt="Organization Logo" />
-          </div>
-          <div class="partner-image">
-            <img id="partnerLogo" src="${
-              data.partnerDetails.logo
-            }" alt="Partner Logo" />
-          </div>
+    <div class="header">
+      <div class="org-image">
+        ${
+          data.org.logo
+            ? `<img
+          id="orgLogo"
+          src="${data.org.logo}"
+          alt="Organization Logo"
+        />`
+            : `
+        <p>${data.org.name}</p>
+        `
+        }
+      </div>
+      <div class="partner-image">
+        <img
+          id="partnerLogo"
+          src="${data.partnerDetails.logo}"
+          alt="Partner Logo"
+        />
+      </div>
+    </div>
+    <div class="title">
+      <div class="title-head">Google Reviews</div>
+      <div class="title-head-date">
+        <span>Report</span>
+        <div class="card">
+          <h1 id="reportDate">${data.reportDate}</h1>
         </div>
-        <div class="title">
-          <div class="title-head">Google Reviews</div>
-          <div class="title-head-date">
-            <span>Report</span>
-            <div class="card">
-              <h1 id="reportDate">${data.reportDate}</h1>
-            </div>
-          </div>
+      </div>
+    </div>
+    <div class="total-reviews">
+      <div class="total-reviews-head-data"><b>Total </b><br />Reviews</div>
+      <div>
+        <div class="total-reviews-header">
+          <p>Yesterday</p>
+          <p>Present<br />Month</p>
+          <p>Last<br />30Days</p>
+          <p class="total-reviews-subheading">Total<br />Reviews</p>
+          <p class="total-reviews-subheading-2">Rating</p>
         </div>
-        <div class="total-reviews">
-          <div class="total-reviews-head-data">
-            <b>Total </b><br />Reviews
-          </div>
-          <div>
-            <div class="total-reviews-header">
-              <p>Yesterday</p>
-              <p>Present<br />Month</p>
-              <p>Last<br />30Days</p>
-              <p class="total-reviews-subheading">Total<br />Reviews</p>
-              <p class="total-reviews-subheading-2">Rating</p>
-            </div>
-            <div class="total-reviews-data">
-              <p class="card-1">${data.totalReviews.yesterday}</p>
-              <p class="card-2">${data.totalReviews.presentMonth}</p>
-              <p class="card-3">${data.totalReviews.lastThirtyDays}</p>
-              <p class="card-4">${data.totalReviews.totalReviews}</p>
-              <p class="card-5">${data.totalReviews.rating}</p>
-            </div>
-          </div>
+        <div class="total-reviews-data">
+          <p class="card-1">${data.totalReviews.yesterday}</p>
+          <p class="card-2">${data.totalReviews.presentMonth}</p>
+          <p class="card-3">${data.totalReviews.lastThirtyDays}</p>
+          <p class="card-4">${data.totalReviews.totalReviews}</p>
+          <p class="card-5">${data.totalReviews.rating}</p>
         </div>
-        <div class="report-table">
-          <table>
-            <thead>
-              <tr style="background-color: black; color: #ffffff">
-                <th>Location Name</th>
-                <th>Yesterday</th>
-                <th>Present<br />Month</th>
-                <th>Last 30<br />Days</th>
-                <th>Total<br />Reviews</th>
-                <th>Rating</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${data.tableData
-                .map(
-                  (item) => `
-                <tr>
-                  <td>${item.locationName}</td>
-                  <td>${item.yesterday}</td>
-                  <td>${item.presentMonth}</td>
-                  <td>${item.lastThirtyDays}</td>
-                  <td>${item.totalReviews}</td>
-                  <td>${item.rating}</td>
-                </tr>
-              `
-                )
-                .join("")}
-            </tbody>
-          </table>
+      </div>
+    </div>
+    <div class="report-table">
+      <table>
+        <thead>
+          <tr style="background-color: black; color: #ffffff">
+            <th>Location Name</th>
+            <th>POC User</th>
+            <th>Yesterday</th>
+            <th>Present<br />Month</th>
+            <th>Last 30<br />Days</th>
+            <th>Total<br />Reviews</th>
+            <th>Rating</th>
+          </tr>
+        </thead>
+        <tbody style="margin-bottom: 20px">
+          ${data.reviewsData
+            .map(
+              (item) => `
+          <tr>
+            <td>${item.locationName}</td>
+            <td>${item.pocUser}</td>
+            <td>${item.yesterday}</td>
+            <td>${item.presentMonth}</td>
+            <td>${item.lastThirtyDays}</td>
+            <td>${item.totalReviews}</td>
+            <td>${item.rating}</td>
+          </tr>
+          `
+            )
+            .join("")}
+        </tbody>
+      </table>
+    </div>
+    <div class="footer-report">
+      <div><p>Powered by</p></div>
+      <div class="footer-image">
+        <img
+          id="footerLogo"
+          src="${data.partnerDetails.logo}"
+          alt="Footer Logo"
+        />
+      </div>
+      <div class="footer-slash"><p>|</p></div>
+      <div class="footer-contact">
+        <div><i class="fa-solid fa-phone"></i></div>
+        <div>
+          <p id="partnerMobile">${data.partnerDetails.mobileNumber}</p>
         </div>
-        <div class="footer-report">
-          <div><p>Powered by</p></div>
-          <div class="footer-image">
-            <img id="footerLogo" src="${
-              data.partnerDetails.logo
-            }" alt="Footer Logo" />
-          </div>
-          <div class="footer-slash"><p>|</p></div>
-          <div class="footer-contact">
-            <div><i class="fa-solid fa-phone"></i></div>
-            <div><p id="partnerMobile">${
-              data.partnerDetails.mobileNumber
-            }</p></div>
-            <div style="margin-left: 10px"><i class="fa-regular fa-envelope"></i></div>
-            <div><p id="partnerEmail">${data.partnerDetails.email}</p></div>
-            <div style="margin-left: 10px"><i class="fa-solid fa-globe"></i></div>
-            <div><p id="partnerWebsite">${data.partnerDetails.website}</p></div>
-          </div>
+        <div style="margin-left: 10px">
+          <i class="fa-regular fa-envelope"></i>
         </div>
+        <div><p id="partnerEmail">${data.partnerDetails.email}</p></div>
+        <div style="margin-left: 10px"><i class="fa-solid fa-globe"></i></div>
+        <div><p id="partnerWebsite">${
+          data.partnerDetails.website ? data.partnerDetails.website : ""
+        }</p></div>
       </div>
     </div>
   </body>
