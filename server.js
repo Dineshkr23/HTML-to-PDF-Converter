@@ -404,8 +404,7 @@ const generateGoogleReviewHTML = (data) => `
 </html>
 `;
 
-const generateWhatsAppWeeklyHTML = (data) => `
-<!DOCTYPE html>
+const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -513,7 +512,10 @@ const generateWhatsAppWeeklyHTML = (data) => `
         align-items: center;
         justify-content: flex-end;
       }
-
+      .org-image p {
+        font-size: 35px;
+        font-weight: 600;
+      }
       .org-image img,
       .partner-image img {
         max-width: 100%; /* Ensures the images do not exceed their natural size */
@@ -531,11 +533,12 @@ const generateWhatsAppWeeklyHTML = (data) => `
         height: auto;
       }
       .title {
-        margin: 30px 0px 10px 20px;
+        margin: 50px 0px 30px 20px;
       }
       .title-header {
         font-size: 50px;
         color: #606060;
+        margin-bottom: -12px;
       }
       .weekly-report {
         font-size: 35px;
@@ -545,7 +548,7 @@ const generateWhatsAppWeeklyHTML = (data) => `
       }
       .date-report {
         font-size: 22px;
-        margin-top: 5px;
+        margin-top: 3px;
         color: #606060;
       }
       .card-report-twocards {
@@ -666,7 +669,7 @@ const generateWhatsAppWeeklyHTML = (data) => `
 
       .flex-table {
         border-radius: 10px; /* Rounded corners */
-        border-spacing: 30px 5px;
+        border-spacing: 30px 3px;
         width: 100%;
       }
       .page-break {
@@ -679,7 +682,6 @@ const generateWhatsAppWeeklyHTML = (data) => `
       }
       .flex-table td {
         text-align: center;
-        border-radius: 10px;
         padding: 3px;
       }
 
@@ -689,7 +691,7 @@ const generateWhatsAppWeeklyHTML = (data) => `
       }
 
       .flex-table tbody tr:nth-child(odd) {
-        background-color: #f9f9f9; /* Light gray background for odd rows */
+        background-color: #f0efef; /* Light gray background for odd rows */
       }
 
       .flex-table tbody tr:nth-child(even) {
@@ -745,7 +747,7 @@ const generateWhatsAppWeeklyHTML = (data) => `
         border-spacing: 5px 10px;
       }
       .individual-broadcast-table tr:nth-child(odd) {
-        background-color: #f7f6f6;
+        background-color: #e6e5e5;
       }
       .individual-broadcast-table td,
       .individual-broadcast-table th {
@@ -825,12 +827,24 @@ const generateWhatsAppWeeklyHTML = (data) => `
         <!-- Header -->
         <div class="header">
           <div class="org-image">
-            <img id="orgLogo" src="${data.orgLogo}" alt="Organization Logo" />
+            ${
+              data.org.logo
+                ? `<img
+              id="orgLogo"
+              src="${data.org.logo}"
+              alt="Organization Logo"
+            />`
+                : `
+            <p>${data.org.name}</p>
+            `
+            }
           </div>
           <div class="partner-image">
-            <img id="partnerLogo" src="${
-              data.partnerDetails.logo
-            }" alt="Partner Logo" />
+            <img
+              id="partnerLogo"
+              src="${data.partnerDetails.logo}"
+              alt="Partner Logo"
+            />
           </div>
         </div>
 
@@ -839,9 +853,9 @@ const generateWhatsAppWeeklyHTML = (data) => `
           <div class="title">
             <p class="title-header">WhatsApp Marketing</p>
             <p class="weekly-report">Weekly report</p>
-            <p class="date-report" id="reportDate">${
-              data.reportDate.startDate
-            } to ${data.reportDate.endDate}</p>
+            <p class="date-report" id="reportDate">
+              ${data.reportDate.startDate} to ${data.reportDate.endDate}
+            </p>
           </div>
         </div>
 
@@ -850,24 +864,27 @@ const generateWhatsAppWeeklyHTML = (data) => `
           <div class="card-individual">
             <div class="individual-broadcast">
               <p>Individual Broadcasts</p>
-              <strong id="individualBroadcasts">${
-                data.broadcastStats.individualBroadcasts
-              }</strong>
+              <strong id="individualBroadcasts"
+                >${data.broadcastStats.individualBroadcasts}</strong
+              >
             </div>
             <div class="broadcast-journeys">
               <div class="journey-title"><p>Broadcast Journeys</p></div>
               <div class="journey">
                 <div>
                   <p>Initiation</p>
-                  <strong id="initiation">${
-                    data.broadcastStats.broadcastJourneys.initiation
-                  }</strong>
+                  <strong id="initiation"
+                    >${data.broadcastStats.broadcastJourneys.initiation}</strong
+                  >
                 </div>
                 <div>
                   <p>Broadcasts</p>
-                  <strong id="broadcasts">${
-                    data.broadcastStats.broadcastJourneys.broadcasts
-                  }</strong>
+                  <strong id="broadcasts"
+                    >${
+                      data.broadcastStats.broadcastJourneys.broadcasts.processed
+                    }
+                    / ${data.broadcastStats.broadcastJourneys.broadcasts.total}
+                  </strong>
                 </div>
               </div>
             </div>
@@ -884,21 +901,25 @@ const generateWhatsAppWeeklyHTML = (data) => `
               </tr>
             </thead>
             <tbody id="conversationsTable">
-            ${data.conversations
-              .map(
-                (item) => `
-              <tr class="${
-                item.type === "Total" ? "table-data-total" : "table-data"
-              }">
-                <td>${item.type}</td>
+              ${data.conversations
+                .map(
+                  (item) => `
+              <tr
+                class="${
+                  item.type === "Total" ? "table-data-total" : "table-data"
+                }"
+              >
+                <td>${
+                  item.type.charAt(0).toUpperCase() + item.type.slice(1)
+                }</td>
                 <td>${item.all}</td>
                 <td>${item.free}</td>
                 <td>${item.cost}</td>
                 <td>${item.paid}</td>
               </tr>
-            `
-              )
-              .join("")}
+              `
+                )
+                .join("")}
             </tbody>
           </table>
         </div>
@@ -920,17 +941,19 @@ const generateWhatsAppWeeklyHTML = (data) => `
               </tr>
             </thead>
             <tbody id="totalMessagesTable">
-               ${data.totalMessagesData
-                 .map(
-                   (item) => `
+              ${data.totalMessagesData
+                .map(
+                  (item) => `
               <tr>
-                <td>${item.type}</td>
+                <td>${
+                  item.type.charAt(0).toUpperCase() + item.type.slice(1)
+                }</td>
                 <td>${item.broadcasts}</td>
                 <td>${item.journeys}</td>
               </tr>
-            `
-                 )
-                 .join("")}
+              `
+                )
+                .join("")}
             </tbody>
           </table>
         </div>
@@ -949,17 +972,17 @@ const generateWhatsAppWeeklyHTML = (data) => `
               </tr>
             </thead>
             <tbody id="dateWiseDataTable">
-            ${data.dateWiseData
-              .map(
-                (item) => `
+              ${data.dateWiseData
+                .map(
+                  (item) => `
               <tr>
                 <td>${item.date}</td>
                 <td>${item.broadcasts}</td>
                 <td>${item.journeys}</td>
               </tr>
-            `
-              )
-              .join("")}
+              `
+                )
+                .join("")}
             </tbody>
           </table>
         </div>
@@ -983,9 +1006,9 @@ const generateWhatsAppWeeklyHTML = (data) => `
               </tr>
             </thead>
             <tbody id="broadcastDetailsTable">
-            ${data.broadcastDetails
-              .map(
-                (item) => `
+              ${data.broadcastDetails
+                .map(
+                  (item) => `
               <tr>
                 <td>${item.campaignName}</td>
                 <td>${item.date}</td>
@@ -996,13 +1019,13 @@ const generateWhatsAppWeeklyHTML = (data) => `
                 <td>${item.sent}</td>
                 <td>${item.failed}</td>
               </tr>
-            `
-              )
-              .join("")}
+              `
+                )
+                .join("")}
             </tbody>
           </table>
         </div>
-
+        <div class="page-break"></div>
         <!-- Broadcast Journeys Table -->
         <div class="individual-broadcast-table-head">
           <p>Broadcast Journeys</p>
@@ -1022,42 +1045,63 @@ const generateWhatsAppWeeklyHTML = (data) => `
               </tr>
             </thead>
             <tbody id="journeyDetailsTable">
-            ${data.journeyDetails
-              .map(
-                (item) => `
+              ${data.journeyDetails
+                .map((journey) => {
+                  const broadcasts = journey.processBroadcasts
+                    .map(
+                      (broadcast, index) => `
               <tr>
-                <td>${item.journeyName}<br/>${item.initiatedDateTime}</td>
-                <td>${item.date}</td>
-                <td>${item.template}</td>
-                <td>${item.total}</td>
-                <td>${item.read}</td>
-                <td>${item.delivered}</td>
-                <td>${item.sent}</td>
-                <td>${item.failed}</td>
+                ${
+                  index === 0
+                    ? `
+                <td rowspan="${journey.processBroadcasts.length}">
+                  ${journey.journeyName}<br />${journey.initiatedDateTime}
+                </td>
+                `
+                    : ""
+                }
+                <td>${broadcast.processedDateTime}</td>
+                <td>${broadcast.template}</td>
+                <td>${broadcast.total}</td>
+                <td>${broadcast.read}</td>
+                <td>${broadcast.delivered}</td>
+                <td>${broadcast.sent}</td>
+                <td>${broadcast.failed}</td>
               </tr>
-            `
-              )
-              .join("")}
+              `
+                    )
+                    .join("");
+                  return broadcasts;
+                })
+                .join("")}
             </tbody>
           </table>
         </div>
         <div class="footer-report">
           <div><p>Powered by</p></div>
           <div class="footer-image">
-            <img id="footerLogo" src="${
-              data.partnerDetails.logo
-            }" alt="Footer Logo" />
+            <img
+              id="footerLogo"
+              src="${data.partnerDetails.logo}"
+              alt="Footer Logo"
+            />
           </div>
           <div class="footer-slash"><p>|</p></div>
           <div class="footer-contact">
             <div><i class="fa-solid fa-phone"></i></div>
-            <div><p id="partnerMobile">${
-              data.partnerDetails.mobileNumber
-            }</p></div>
-            <div style="margin-left: 10px"><i class="fa-regular fa-envelope"></i></div>
+            <div>
+              <p id="partnerMobile">${data.partnerDetails.mobileNumber}</p>
+            </div>
+            <div style="margin-left: 10px">
+              <i class="fa-regular fa-envelope"></i>
+            </div>
             <div><p id="partnerEmail">${data.partnerDetails.email}</p></div>
-            <div style="margin-left: 10px"><i class="fa-solid fa-globe"></i></div>
-            <div><p id="partnerWebsite">${data.partnerDetails.website}</p></div>
+            <div style="margin-left: 10px">
+              <i class="fa-solid fa-globe"></i>
+            </div>
+            <div><p id="partnerWebsite">${
+              data.partnerDetails.website ? data.partnerDetails.website : ""
+            }</p></div>
           </div>
         </div>
       </div>
