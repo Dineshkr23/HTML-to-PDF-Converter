@@ -404,7 +404,8 @@ const generateGoogleReviewHTML = (data) => `
 </html>
 `;
 
-const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
+const generateWhatsAppWeeklyHTML = (data) => `
+<!-- weeklyreport.html -->
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -431,12 +432,11 @@ const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
         padding: 0;
       }
       :root {
-        font-size: 14px;
         font-family: "poppins", sans-serif;
       }
       @page {
         size: A4;
-        margin: 30px 0 0;
+        margin: 0px;
       }
       body {
         background-image: url(https://demo.emovur.com/background-image.png);
@@ -444,12 +444,13 @@ const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
         object-fit: cover;
         background-position-x: center;
         background-size: contain;
+        font-size: 14px;
       }
 
       @media print {
         @page {
           size: A4;
-          margin: 30px 0 0;
+          margin: 0px 0 30px;
         }
         body {
           background-image: url(https://demo.emovur.com/background-image.png);
@@ -457,13 +458,30 @@ const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
           object-fit: cover;
           background-position-x: center;
           background-size: contain;
+          font-size: 14px;
         }
-        .container {
-          margin: 10px 20px;
+
+        table {
+          page-break-after: auto;
+        }
+        tr {
+          page-break-inside: avoid;
+          page-break-after: auto;
+        }
+        td {
+          page-break-inside: avoid;
+          page-break-after: auto;
+        }
+        thead {
+          display: table-header-group;
+        }
+
+        .page-break {
+          page-break-before: always;
         }
         .footer-report {
           position: fixed;
-          bottom: 0;
+          bottom: -1%;
           left: 0;
           right: 0;
           display: flex;
@@ -491,9 +509,6 @@ const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
           align-items: center;
           gap: 5px;
         }
-        .page-break {
-          page-break-before: always;
-        }
       }
 
       .header {
@@ -516,6 +531,7 @@ const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
         font-size: 35px;
         font-weight: 600;
       }
+
       .org-image img,
       .partner-image img {
         max-width: 100%; /* Ensures the images do not exceed their natural size */
@@ -533,7 +549,7 @@ const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
         height: auto;
       }
       .title {
-        margin: 50px 0px 30px 20px;
+        margin: 20px 0px 30px 20px;
       }
       .title-header {
         font-size: 50px;
@@ -555,7 +571,6 @@ const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
         display: flex;
         width: 100%;
         margin-top: 20px;
-        gap: 20px;
       }
 
       .card-individual {
@@ -747,14 +762,16 @@ const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
         border-spacing: 5px 10px;
       }
       .individual-broadcast-table tr:nth-child(odd) {
-        background-color: #e6e5e5;
+        background-color: #f0efef;
       }
-      .individual-broadcast-table td,
+      .individual-broadcast-table td{
+        padding: 2px 5px;
+      }
       .individual-broadcast-table th {
-        padding: 2px 10px;
+        padding: 10px 5px;
       }
       .individual-broadcast-table th:nth-child(1) {
-        color: #0c9ffa;
+        color: #000000;
       }
       .individual-broadcast-table th:nth-child(5) {
         color: rgb(0, 164, 81);
@@ -768,19 +785,11 @@ const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
       .individual-broadcast-table th:nth-child(8) {
         color: rgb(231, 5, 5);
       }
-      #journeyDetailsTable td {
+      #journeyDetailsTable td, #broadcastDetailsTable td, #dateWiseDataTable td , #totalMessagesTable td{
+        font-size: 14px;
         text-align: center;
       }
-      #broadcastDetailsTable td {
-        text-align: center;
-      }
-
       /* <!-- Footer --> */
-      .footer-report {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
 
       .footer-image img {
         width: 80px;
@@ -909,9 +918,9 @@ const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
                   item.type === "Total" ? "table-data-total" : "table-data"
                 }"
               >
-                <td>${
-                  item.type.charAt(0).toUpperCase() + item.type.slice(1)
-                }</td>
+                <td>
+                  ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+                </td>
                 <td>${item.all}</td>
                 <td>${item.free}</td>
                 <td>${item.cost}</td>
@@ -945,9 +954,9 @@ const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
                 .map(
                   (item) => `
               <tr>
-                <td>${
-                  item.type.charAt(0).toUpperCase() + item.type.slice(1)
-                }</td>
+                <td>
+                  ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+                </td>
                 <td>${item.broadcasts}</td>
                 <td>${item.journeys}</td>
               </tr>
@@ -988,17 +997,17 @@ const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
         </div>
         <div class="page-break"></div>
         <!-- Individual Broadcasts Table -->
-        <div class="individual-broadcast-table-head" style="margin-top: 50px">
+        <div class="individual-broadcast-table-head">
           <p>Individual broadcasts</p>
         </div>
         <div class="table-container-individual-broadcast">
           <table class="individual-broadcast-table">
             <thead>
-              <tr style="background-color: #ffffff">
+              <tr style="background-color: #c8e6f8">
                 <th>Campaign Name</th>
                 <th>Date</th>
                 <th>Template</th>
-                <th>Total Recipients</th>
+                <th>Total</th>
                 <th>Read</th>
                 <th>Delivered</th>
                 <th>Sent</th>
@@ -1033,11 +1042,11 @@ const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
         <div class="table-container-individual-broadcast">
           <table class="individual-broadcast-table">
             <thead>
-              <tr style="background-color: #ffffff">
-                <th>Journey <br />Name <br />Initiated Date <br />& Time</th>
+              <tr style="background-color: #c8e6f8">
+                <th>Journey Name</th>
                 <th>Date</th>
                 <th>Template</th>
-                <th>Total <br />Recipients</th>
+                <th>Total</th>
                 <th>Read</th>
                 <th>Delivered</th>
                 <th>Sent</th>
@@ -1099,16 +1108,19 @@ const generateWhatsAppWeeklyHTML = (data) => `<!DOCTYPE html>
             <div style="margin-left: 10px">
               <i class="fa-solid fa-globe"></i>
             </div>
-            <div><p id="partnerWebsite">${
-              data.partnerDetails.website ? data.partnerDetails.website : ""
-            }</p></div>
+            <div>
+              <p id="partnerWebsite">
+                ${
+                  data.partnerDetails.website ? data.partnerDetails.website : ""
+                }
+              </p>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </body>
-</html>
-`;
+</html>`;
 
 const generateGoogleReviewPDF = async (htmlContent) => {
   const browser = await puppeteer.launch({
@@ -1126,7 +1138,13 @@ const generateGoogleReviewPDF = async (htmlContent) => {
   const pdfBuffer = await page.pdf({
     format: "A4",
     printBackground: true,
-    displayHeaderFooter: true,
+    displayHeaderFooter: false,
+    margin: {
+      top: "0px",
+      right: "0px",
+      bottom: "0px",
+      left: "0px",
+    },
   });
 
   await page.close();
