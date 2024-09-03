@@ -1,13 +1,14 @@
 require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
-const puppeteer = require("puppeteer");
 const fs = require("fs");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
+const puppeteer = require("puppeteer");
+const genericPool = require("generic-pool");
 
 const app = express();
-const PORT = process.env.PORT || 5003;
+const PORT = process.env.PORT || 5009;
 const PDF_DIR = path.join(__dirname, "pdfs");
 
 // Create the PDFs directory if it doesn't exist
@@ -1122,127 +1123,222 @@ const generateWhatsAppWeeklyHTML = (data) => `
   </body>
 </html>`;
 
-const generateGoogleReviewPDF = async (htmlContent) => {
-  const browser = await puppeteer.launch({
-    args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    headless: true,
-    timeout: 60000,
-  });
-
-  const page = await browser.newPage();
-  await page.setContent(htmlContent, {
-    waitUntil: "networkidle2",
-    timeout: 60000,
-  });
-
-  const pdfBuffer = await page.pdf({
-    format: "A4",
-    printBackground: true,
-    displayHeaderFooter: false,
-    margin: {
-      top: "0px",
-      right: "0px",
-      bottom: "0px",
-      left: "0px",
-    },
-  });
-
-  await page.close();
-  await browser.close();
-
-  const pdfId = uuidv4();
-  const pdfPath = path.join(PDF_DIR, `${pdfId}.pdf`);
-  fs.writeFileSync(pdfPath, pdfBuffer);
-
-  return pdfId;
-};
-
-app.post("/google-review", async (req, res) => {
-  const data = req.body;
-
-  if (!data) {
-    return res.status(400).json({ error: "JSON data is required" });
+// Puppeteer pool configuration
+const browserPool = genericPool.createPool(
+  {
+    create: () =>
+      puppeteer.launch({
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+        headless: true,
+        timeout: 60000,
+      }),
+    destroy: (browser) => browser.close(),
+  },
+  {
+    max: 3, // Maximum number of browsers
+    min: 2, // Minimum number of browsers
   }
+);
+
+// Utility to generate PDF
+const generatePDF = async (htmlContent) => {
+  const browser = await browserPool.acquire();
+  let pdfBuffer;
 
   try {
-    const html = generateGoogleReviewHTML(data);
-
-    const pdfId = await generateGoogleReviewPDF(html);
-
-    res.json({ url: `${req.protocol}://${req.get("host")}/pdfs/${pdfId}` });
-  } catch (error) {
-    console.error("Error generating PDF:", error);
-    res.status(500).json({ error: "Failed to generate PDF" });
-  }
-});
-
-app.post("/whatsapp-weekly", async (req, res) => {
-  const data = req.body;
-
-  if (!data) {
-    return res.status(400).json({ error: "JSON data is required" });
-  }
-
-  try {
-    const html = generateWhatsAppWeeklyHTML(data);
-
-    const pdfId = await generateGoogleReviewPDF(html);
-
-    res.json({ url: `${req.protocol}://${req.get("host")}/pdfs/${pdfId}` });
-  } catch (error) {
-    console.error("Error generating PDF:", error);
-    res.status(500).json({ error: "Failed to generate PDF" });
-  }
-});
-
-app.post("/html-text", async (req, res) => {
-  const html = req.body;
-
-  if (!html) {
-    return res.status(400).json({ error: "HTML content is required" });
-  }
-
-  try {
-    const browser = await puppeteer.launch({
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      headless: true,
+    const page = await browser.newPage();
+    await page.setContent(htmlContent, {
+      waitUntil: "networkidle2",
       timeout: 60000,
     });
-
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle2", timeout: 60000 });
-
-    const pdfBuffer = await page.pdf({
+    pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
-      displayHeaderFooter: true,
+      displayHeaderFooter: false,
+      margin: { top: "0px", right: "0px", bottom: "0px", left: "0px" },
     });
-
     await page.close();
-    await browser.close();
+  } catch (error) {
+    console.log("Error generating PDF:", error);
+    throw new Error("Failed to generate PDF");
+  } finally {
+    await browserPool.release(browser);
+  }
+
+  return pdfBuffer;
+};
+
+// Handle PDF generation requests
+const handlePDFRequest = async (req, res, generateHTMLFunction) => {
+  const data = req.body;
+
+  if (!data) {
+    return res.status(400).json({ error: "JSON data is required" });
+  }
+
+  try {
+    const htmlContent = generateHTMLFunction(data);
+    const pdfBuffer = await generatePDF(htmlContent);
 
     const pdfId = uuidv4();
     const pdfPath = path.join(PDF_DIR, `${pdfId}.pdf`);
-
     fs.writeFileSync(pdfPath, pdfBuffer);
 
-    res.json({ url: `${req.protocol}://${req.get("host")}/pdfs/${pdfId}` });
+    return res.json({
+      url: `${req.protocol}://${req.get("host")}/pdfs/${pdfId}`,
+    });
   } catch (error) {
-    console.error("Error generating PDF:", error);
-    res.status(500).json({ error: "Failed to generate PDF" });
+    console.log("Error generating PDF:", error);
+    return res.status(500).json({ error: "Failed to generate PDF" });
   }
-});
+};
+
+// Routes
+app.post("/google-review", (req, res) =>
+  handlePDFRequest(req, res, generateGoogleReviewHTML)
+);
+app.post("/whatsapp-weekly", (req, res) =>
+  handlePDFRequest(req, res, generateWhatsAppWeeklyHTML)
+);
+app.post("/html-text", (req, res) =>
+  handlePDFRequest(req, res, (html) => html)
+);
 
 app.get("/pdfs/:id", (req, res) => {
   const pdfPath = path.join(PDF_DIR, `${req.params.id}.pdf`);
 
   if (fs.existsSync(pdfPath)) {
     return res.sendFile(pdfPath);
-  } else {
-    return res.status(404).json({ error: "PDF not found" });
   }
+  return res.status(404).json({ error: "PDF not found" });
 });
 
+// Start the server
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+// const generateGoogleReviewPDF = async (htmlContent) => {
+//   const browser = await puppeteer.launch({
+//     args: ["--no-sandbox", "--disable-setuid-sandbox"],
+//     headless: true,
+//     timeout: 60000,
+//   });
+
+//   const page = await browser.newPage();
+//   await page.setContent(htmlContent, {
+//     waitUntil: "networkidle2",
+//     timeout: 60000,
+//   });
+
+//   const pdfBuffer = await page.pdf({
+//     format: "A4",
+//     printBackground: true,
+//     displayHeaderFooter: false,
+//     margin: {
+//       top: "0px",
+//       right: "0px",
+//       bottom: "0px",
+//       left: "0px",
+//     },
+//   });
+
+//   await page.close();
+//   await browser.close();
+
+//   const pdfId = uuidv4();
+//   const pdfPath = path.join(PDF_DIR, `${pdfId}.pdf`);
+//   fs.writeFileSync(pdfPath, pdfBuffer);
+
+//   return pdfId;
+// };
+
+// app.post("/google-review", async (req, res) => {
+//   const data = req.body;
+
+//   if (!data) {
+//     return res.status(400).json({ error: "JSON data is required" });
+//   }
+
+//   try {
+//     const html = generateGoogleReviewHTML(data);
+
+//     const pdfId = await generateGoogleReviewPDF(html);
+
+//     res.json({ url: `${req.protocol}://${req.get("host")}/pdfs/${pdfId}` });
+//   } catch (error) {
+//     console.error("Error generating PDF:", error);
+//     res.status(500).json({ error: "Failed to generate PDF" });
+//   }
+// });
+
+// app.post("/whatsapp-weekly", async (req, res) => {
+//   const data = req.body;
+
+//   if (!data) {
+//     return res.status(400).json({ error: "JSON data is required" });
+//   }
+
+//   try {
+//     const html = generateWhatsAppWeeklyHTML(data);
+
+//     const pdfId = await generateGoogleReviewPDF(html);
+
+//     res.json({ url: `${req.protocol}://${req.get("host")}/pdfs/${pdfId}` });
+//   } catch (error) {
+//     console.error("Error generating PDF:", error);
+//     res.status(500).json({ error: "Failed to generate PDF" });
+//   }
+// });
+
+// app.post("/html-text", async (req, res) => {
+//   const html = req.body;
+
+//   if (!html) {
+//     return res.status(400).json({ error: "HTML content is required" });
+//   }
+
+//   try {
+//     const browser = await puppeteer.launch({
+//       args: ["--no-sandbox", "--disable-setuid-sandbox"],
+//       headless: true,
+//       timeout: 60000,
+//     });
+
+//     const page = await browser.newPage();
+//     await page.setContent(html, { waitUntil: "networkidle2", timeout: 60000 });
+
+//     const pdfBuffer = await page.pdf({
+//       format: "A4",
+//       printBackground: true,
+//       displayHeaderFooter: true,
+//     });
+
+//     await page.close();
+//     await browser.close();
+
+//     const pdfId = uuidv4();
+//     const pdfPath = path.join(PDF_DIR, `${pdfId}.pdf`);
+
+//     fs.writeFileSync(pdfPath, pdfBuffer);
+
+//     res.json({ url: `${req.protocol}://${req.get("host")}/pdfs/${pdfId}` });
+//   } catch (error) {
+//     console.error("Error generating PDF:", error);
+//     res.status(500).json({ error: "Failed to generate PDF" });
+//   }
+// });
+
+// app.get("/pdfs/:id", (req, res) => {
+//   const pdfPath = path.join(PDF_DIR, `${req.params.id}.pdf`);
+
+//   if (fs.existsSync(pdfPath)) {
+//     return res.sendFile(pdfPath);
+//   } else {
+//     return res.status(404).json({ error: "PDF not found" });
+//   }
+// });
+
+// app.listen(PORT, () => {
+//   console.log(`Server is running on port ${PORT}`);
+// });
