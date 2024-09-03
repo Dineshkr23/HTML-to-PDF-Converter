@@ -1131,11 +1131,12 @@ const browserPool = genericPool.createPool(
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
         headless: true,
         timeout: 60000,
+        protocolTimeout: 120000,
       }),
     destroy: (browser) => browser.close(),
   },
   {
-    max: 3, // Maximum number of browsers
+    max: 5, // Maximum number of browsers
     min: 2, // Minimum number of browsers
   }
 );
@@ -1159,8 +1160,15 @@ const generatePDF = async (htmlContent) => {
     });
     await page.close();
   } catch (error) {
-    console.log("Error generating PDF:", error);
-    throw new Error("Failed to generate PDF");
+    console.error("Error generating PDF:", error.message);
+
+    if (error.message.includes("Network.enable timed out")) {
+      throw new Error("Network timeout: The page took too long to load.");
+    } else if (error.message.includes("ProtocolError")) {
+      throw new Error("Protocol error: Puppeteer encountered a problem.");
+    } else {
+      throw new Error(`Failed to generate PDF: ${error.message}`);
+    }
   } finally {
     await browserPool.release(browser);
   }
