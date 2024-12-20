@@ -1431,7 +1431,7 @@ const generateInvoiceHTML = (data) => `
               <th class="sr-no">#</th>
               <th class="sr-no">Item & Description</th>
               <th class="sr-no">Qty</th>
-              <th class="sr-no">CGST</th>
+              <th class="sr-no">GST</th>
               <th class="sr-no">Amount</th>
             </tr>
           </thead>
@@ -1454,13 +1454,13 @@ const generateInvoiceHTML = (data) => `
             <p id="sub-total" class="total-data">${data.subTotal}</p>
           </div>
           <div class="total">
-            <p class="total-data">CGST</p>
+            <p class="total-data">GST</p>
             <p id="cgst" class="total-data">${data.cgst}</p>
           </div>
-          <div class="total">
+          <!-- <div class="total">
             <p class="total-data">IGST</p>
             <p id="sgst" class="total-data">${data.igst}</p>
-          </div>
+          </div> -->
 
           <div class="total" id="grand-total-divider">
             <p class="total-data">Grand Total</p>
@@ -1471,7 +1471,7 @@ const generateInvoiceHTML = (data) => `
     </div>
 
     <script>
-       const data = ${JSON.stringify(data)};
+      const data = ${JSON.stringify(data)}
 
       function populatePlaceholders() {
         // Replacing placeholders in company details
@@ -1530,13 +1530,9 @@ const generateInvoiceHTML = (data) => `
         // Populating totals
         document.getElementById("sub-total").textContent = data.billing.amount;
         document.getElementById("cgst").textContent = data.billing.tax;
-        document.getElementById("sgst").textContent = data.billing.tax;
+        // document.getElementById("sgst").textContent = data.billing.tax;
         document.getElementById("grand-total").textContent =
           data.billing.finalAmount;
-
-        // Populating bank details (example placeholder)
-        document.getElementById("bank-details").textContent =
-          "Bank Details: Example Bank, Account No: 123456789";
       }
 
       // Call the function to populate the placeholders
