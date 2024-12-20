@@ -1471,47 +1471,7 @@ const generateInvoiceHTML = (data) => `
     </div>
 
     <script>
-      const data = {
-        partnerProfile: {
-          addressLine1: "303, SLV PRINSS APARTMENT",
-          addressLine2: "BGS Global Hsopital Road,Mylasandra Village",
-          billingName: "Emovur - Audentrix Pvt Ltd",
-          city: "Bengaluru",
-          country: "India",
-          createdAt: "2024-12-06T12:52:08.250Z",
-          gstin: "29AARCA0604L1ZG",
-          pincode: "560060",
-          state: "Karnataka",
-        },
-        orgProfile: {
-          addressLine1: "303, SLV PRINSS APARTMENT",
-          addressLine2: "BGS Global Hsopital Road,Mylasandra Village",
-          billingName: "Emovur - Audentrix Pvt Ltd",
-          city: "Bengaluru",
-          country: "India",
-          createdAt: "2024-12-06T12:52:08.250Z",
-          gstin: "29AARCA0604L1ZG",
-          pincode: "560060",
-          state: "Karnataka",
-        },
-        invoiceNo: "EMO230238",
-        invoiceDate: "01/11/2023",
-
-        items: [
-          {
-            item: "Balance",
-            quantity: "500",
-            taxPer: "9",
-            taxAmount: "45",
-            finalAmount: "545",
-          },
-        ],
-        billing: {
-          amount: "500",
-          tax: "45",
-          finalAmount: "545",
-        },
-      };
+       const data = ${JSON.stringify(data)};
 
       function populatePlaceholders() {
         // Replacing placeholders in company details
