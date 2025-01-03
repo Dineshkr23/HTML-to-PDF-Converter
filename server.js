@@ -1123,424 +1123,611 @@ const generateWhatsAppWeeklyHTML = (data) => `
   </body>
 </html>`;
 
-const generateInvoiceHTML = (data) => `
-<!DOCTYPE html>
+const generateInvoiceHTML = (data) => `<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-      integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
-      crossorigin="anonymous"
-      referrerpolicy="no-referrer"
-    />
-    <title>Invoice</title>
-    <style>
-      /* General Styles */
-      body {
-        font-family: Arial, sans-serif;
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
+    rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <title>Invoice</title>
+  <style>
+    /* General Styles */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      font-family: "poppins", sans-serif;
+    }
+
+    .invoice-container {
+      max-width: 100%;
+      margin: 50px 20px;
+      padding: 20px;
+      background-color: #fff;
+      box-sizing: border-box;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between !important;
+      align-items: center;
+      margin-bottom: 20px;
+      font-family: arial, sans-serif;
+    }
+
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .header img {
+      height: 60px;
+    }
+
+    .section {
+      margin-bottom: 20px;
+    }
+
+    .section h3 {
+      margin-bottom: 10px;
+    }
+
+    .details {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .details div {
+      width: 48%;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .table th,
+    .table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+      font-family: arial, sans-serif;
+    }
+
+    .table th {
+      background-color: #f2f2f2;
+    }
+
+    .total {
+      margin-right: 30px;
+      display: flex;
+      justify-content: right;
+      align-items: center;
+      gap: 100px;
+      margin-bottom: 20px;
+    }
+
+    .total-data-container {
+      margin-top: 60px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .bill-to-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #555;
+    }
+
+    .invoice-header {
+      width: 40%;
+    }
+
+    .company-name {
+      font-size: 20px;
+      font-family: arial, sans-serif;
+      font-weight: bold;
+      text-align: right;
+    }
+
+    .company-name-address {
+      font-size: 14px;
+      text-align: right;
+      font-family: arial, sans-serif;
+    }
+
+    .company-name-bill {
+      font-size: 20px;
+      font-weight: bold;
+      text-align: left;
+      margin-bottom: 10px;
+      font-family: arial, sans-serif;
+    }
+
+    .company-name-address-bill {
+      font-size: 14px;
+      text-align: left;
+      margin-bottom: 5px;
+      font-family: arial, sans-serif;
+    }
+
+    .address {
+      font-size: 14px;
+      line-height: 1;
+      margin-bottom: 10px;
+      width: 100%;
+      line-height: 1.5;
+      text-align: right;
+      font-family: arial, sans-serif;
+    }
+
+    .company-details {
+      display: block;
+      width: 60%;
+      line-height: 1.5;
+      font-family: arial, sans-serif;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    .invoice-line {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 100%;
+      height: 40px;
+      /* Adjust based on your design */
+      margin: 20px 0 30px 0;
+    }
+
+    .invoice-line::before,
+    .invoice-line::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      width: 42%;
+      height: 1px;
+      background-color: #ccc;
+    }
+
+    .invoice-line::before {
+      left: 0;
+    }
+
+    .invoice-line::after {
+      right: 0;
+    }
+
+    .invoice-text {
+      background-color: #fff;
+      /* Background color to make text appear on top of the line */
+      padding: 0 10px;
+      /* Space around the text */
+
+      font-size: 20px;
+      font-family: arial, sans-serif;
+      color: rgba(6, 148, 224, 0.6);
+    }
+
+    .invoice-header-tablerow {
+      font-size: 14px;
+      font-weight: 300;
+      font-family: arial, sans-serif;
+    }
+
+    .table-container-main {
+      margin-top: 50px;
+    }
+
+    .sr-no {
+      font-weight: 100;
+    }
+
+    .total-data {
+      /* margin-bottom: 20px; */
+      font-weight: 300;
+      font-size: 14px;
+      font-family: arial, sans-serif;
+    }
+
+    #grand-total-divider {
+      border-top: #ccc 1px solid;
+      padding: 10px 0px 10px;
+      border-bottom: #ccc 1px solid;
+    }
+
+    .footer-section-back {
+      line-height: 1.2;
+      font-size: 12px;
+      font-family: arial, sans-serif;
+    }
+
+    /* <!-- Footer --> */
+
+    .footer-image img {
+      width: 80px;
+      height: auto;
+      margin-top: 5px;
+      margin-left: 10px;
+    }
+
+    .footer-slash p {
+      margin: 0 10px;
+      font-weight: 800;
+    }
+
+    .footer-contact {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .footer-contact div {
+      text-align: center;
+    }
+
+    .footer-contact i {
+      font-size: 12px;
+      /* Adjust icon size as needed */
+      width: 20px;
+      /* Fixed width for the icon container */
+      height: 20px;
+      /* Fixed height for the icon container */
+      line-height: 20px;
+      /* Center the icon vertically */
+      border-radius: 50%;
+      /* Make the icon container round */
+      background-color: #ffffff;
+      /* Background color for the round icon container */
+      border: 1px solid #0b0b0b;
+      /* Border color for the round icon container */
+    }
+
+    .message-icon {
+      width: 15px;
+      /* Adjust width as needed */
+      height: auto;
+      /* Maintain aspect ratio */
+      margin-left: 5px;
+      /* Adjust margin as needed */
+      vertical-align: middle;
+      /* Align image vertically */
+    }
+
+    /* Print Styles */
+    @media print {
+      @page {
+        size: A4;
         margin: 0;
-        padding: 0;
-      }
-
-      :root {
-        font-family: "poppins", sans-serif;
-      }
-
-      .invoice-container {
-        max-width: 100%;
-        margin: 50px 20px;
-        padding: 20px;
-        background-color: #fff;
-        box-sizing: border-box;
       }
 
       .header {
         display: flex;
         justify-content: space-between !important;
         align-items: center;
-        margin-bottom: 20px;
-        font-family: arial, sans-serif;
       }
 
-      .header img {
-        height: 60px;
-      }
-
-      .section {
-        margin-bottom: 20px;
-      }
-
-      .section h3 {
-        margin-bottom: 10px;
-      }
-
-      .details {
-        display: flex;
-        justify-content: space-between;
-      }
-
-      .details div {
-        width: 48%;
-      }
-
-      .table {
-        width: 100%;
-        border-collapse: collapse;
-      }
-
-      .table th,
-      .table td {
-        border: 1px solid #ddd;
-        padding: 8px;
-        text-align: left;
-        font-family: arial, sans-serif;
-      }
-
-      .table th {
-        background-color: #f2f2f2;
-      }
-
-      .total {
-        margin-right: 30px;
-        display: flex;
-        justify-content: right;
-        align-items: center;
-        gap: 100px;
-      }
-      .total-data-container {
-        margin-top: 60px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-      .bill-to-section {
-        display: flex;
-        justify-content: space-between;
-        align-items: baseline;
-      }
-
+      .header,
       .footer {
-        text-align: center;
-        margin-top: 30px;
-        font-size: 0.9em;
-        color: #555;
+        break-inside: avoid;
+        /* Prevent header/footer splitting across pages */
       }
-      .invoice-header {
-        width: 40%;
-      }
-      .company-name {
-        font-size: 20px;
-        font-family: arial, sans-serif;
-        font-weight: bold;
-        text-align: right;
-      }
-      .company-name-address {
+
+      body {
+        background-image: url(https://demo.emovur.com/background-image.png);
+        background-repeat: no-repeat;
+        object-fit: cover;
+        background-position-x: center;
+        background-size: contain;
         font-size: 14px;
-        text-align: right;
-        font-family: arial, sans-serif;
       }
-      .company-name-bill {
-        font-size: 20px;
-        font-weight: bold;
-        text-align: left;
-        margin-bottom: 10px;
-        font-family: arial, sans-serif;
+
+      table {
+        page-break-after: auto;
       }
-      .company-name-address-bill {
-        font-size: 14px;
-        text-align: left;
-        margin-bottom: 5px;
-        font-family: arial, sans-serif;
+
+      tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
       }
-      .address {
-        font-size: 14px;
-        line-height: 1;
-        margin-bottom: 10px;
-        width: 100%;
-        line-height: 1.5;
-        text-align: right;
-        font-family: arial, sans-serif;
+
+      td {
+        page-break-inside: avoid;
+        page-break-after: auto;
       }
-      .company-details {
-        display: block;
-        width: 60%;
-        line-height: 1.5;
-        font-family: arial, sans-serif;
+
+      thead {
+        display: table-header-group;
       }
-      p {
-        margin: 0;
+
+      .page-break {
+        page-break-before: always;
       }
-      .invoice-line {
+
+      .footer-report {
+        position: fixed;
+        bottom: 0%;
+        left: 0;
+        right: 0;
         display: flex;
         align-items: center;
         justify-content: center;
-        position: relative;
-        width: 100%;
-        height: 40px; /* Adjust based on your design */
-        margin: 20px 0 30px 0;
+        padding: 10px 0;
       }
 
-      .invoice-line::before,
-      .invoice-line::after {
-        content: "";
-        position: absolute;
-        top: 50%;
-        width: 42%;
-        height: 1px;
-        background-color: #ccc;
+      .footer-image img {
+        width: 80px;
+        height: auto;
+        margin-top: 5px;
+        margin-left: 10px;
       }
 
-      .invoice-line::before {
-        left: 0;
+      .footer-slash p {
+        margin: 0 10px;
+        font-weight: 800;
       }
 
-      .invoice-line::after {
-        right: 0;
+      .footer-contact {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
       }
+    }
+  </style>
+</head>
 
-      .invoice-text {
-        background-color: #fff; /* Background color to make text appear on top of the line */
-        padding: 0 10px; /* Space around the text */
+<body>
+  <div class="invoice-container">
+    <div class="header">
+      <img src="" alt="Partner Logo" id="partnerLogo" />
 
-        font-size: 20px;
-        font-family: arial, sans-serif;
-        color: rgba(6, 148, 224, 0.6);
-      }
-      .invoice-header-tablerow {
-        font-size: 14px;
-        font-weight: 300;
-        font-family: arial, sans-serif;
-      }
-      .table-container-main {
-        margin-top: 50px;
-      }
-      .sr-no {
-        font-weight: 100;
-      }
-      .total-data {
-        margin-bottom: 20px;
-        font-weight: 300;
-        font-size: 14px;
-        font-family: arial, sans-serif;
-      }
-      #grand-total-divider {
-        border-top: #ccc 1px solid;
-        padding: 10px 0px 0px;
-        border-bottom: #ccc 1px solid;
-      }
-
-      /* Print Styles */
-      @media print {
-        body {
-          background-color: #fff;
-        }
-
-        @page {
-          size: A4;
-          margin: 0;
-        }
-        .header {
-          display: flex;
-          justify-content: space-between !important;
-          align-items: center;
-        }
-
-        .header,
-        .footer {
-          break-inside: avoid; /* Prevent header/footer splitting across pages */
-        }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="invoice-container">
-      <div class="header">
-        <img src="https://emovur.com/images/logo/logo.png" alt="Logo" />
-        <div id="company-details" class="company-details">
-          <p class="company-name">${data.partnerProfile.billingName}</p>
-          <p class="company-name-address">
-            ${data.partnerProfile.addressLine1}
-            <span class="address-line"
-              >${data.partnerProfile.addressLine2}</span
-            >
-          </p>
-          <p class="company-name-address">
-            ${data.partnerProfile.city}
-            <span class="address-line">${data.partnerProfile.state}</span> -
-            <span class="address-line">${data.partnerProfile.pincode}</span>
-          </p>
-          <p class="company-name-address">
-            GSTIN: ${data.partnerProfile.gstin}
-          </p>
-        </div>
-      </div>
-
-      <div class="invoice-line">
-        <span class="invoice-text">INVOICE</span>
-      </div>
-
-      <div class="bill-to-section">
-        <div>
-          <div id="billing-details">
-            <p class="company-name-address-bill">Bill To</p>
-            <p class="company-name-bill">${data.orgProfile.billingName}</p>
-            <p class="company-name-address-bill">
-              ${data.orgProfile.addressLine1}
-            </p>
-            <p class="company-name-address-bill">
-              ${data.orgProfile.addressLine2}
-            </p>
-            <p class="company-name-address-bill">${data.orgProfile.city}</p>
-            <p class="company-name-address-bill">
-              ${data.orgProfile.state}
-              <span class="address-line">- ${data.orgProfile.pincode}</span>
-            </p>
-          </div>
-        </div>
-        <div class="invoice-header">
-          <table class="table">
-            <tr>
-              <th class="invoice-header-tablerow">Invoice #</th>
-              <td id="invoice-number" class="invoice-header-tablerow">
-                ${data.invoiceNo}
-              </td>
-            </tr>
-            <tr>
-              <th class="invoice-header-tablerow">Invoice Date</th>
-              <td id="invoice-date" class="invoice-header-tablerow">
-                ${data.invoiceDate}
-              </td>
-            </tr>
-          </table>
-        </div>
-      </div>
-
-      <div class="table-container-main">
-        <table class="table">
-          <thead>
-            <tr>
-              <th class="sr-no">#</th>
-              <th class="sr-no">Item & Description</th>
-              <th class="sr-no">Qty</th>
-              <th class="sr-no">GST</th>
-              <th class="sr-no">Amount</th>
-            </tr>
-          </thead>
-          <tbody id="items-table">
-            <!-- Items will be dynamically added here -->
-          </tbody>
-        </table>
-      </div>
-
-      <div class="total-data-container">
-        <img
-          src="https://wd.emovur.com/sigh.png"
-          alt="Logo"
-          width="250"
-          height="200"
-        />
-        <div>
-          <div class="total">
-            <p class="total-data">Sub Total</p>
-            <p id="sub-total" class="total-data">${data.subTotal}</p>
-          </div>
-          <div class="total">
-            <p class="total-data">GST</p>
-            <p id="cgst" class="total-data">${data.cgst}</p>
-          </div>
-          <!-- <div class="total">
-            <p class="total-data">IGST</p>
-            <p id="sgst" class="total-data">${data.igst}</p>
-          </div> -->
-
-          <div class="total" id="grand-total-divider">
-            <p class="total-data">Grand Total</p>
-            <p id="grand-total" class="total-data">${data.grandTotal}</p>
-          </div>
-        </div>
+      <div id="company-details" class="company-details">
+        <p class="company-name">${data.partnerProfile.billingName}</p>
+        <p class="company-name-address">
+          ${data.partnerProfile.addressLine1}
+          <span class="address-line">${data.partnerProfile.addressLine2}</span>
+        </p>
+        <p class="company-name-address">
+          ${data.partnerProfile.city}
+          <span class="address-line">${data.partnerProfile.state}</span> -
+          <span class="address-line">${data.partnerProfile.pincode}</span>
+        </p>
+        <p class="company-name-address">
+          GSTIN: ${data.partnerProfile.gstin}
+        </p>
       </div>
     </div>
 
-    <script>
-      const data = ${JSON.stringify(data)}
+    <div class="invoice-line">
+      <span class="invoice-text">INVOICE</span>
+    </div>
 
-      function populatePlaceholders() {
-        // Replacing placeholders in company details
-        const companyDetails = document.getElementById("company-details");
-        companyDetails.innerHTML = companyDetails.innerHTML.replace(
-          /\$\{data\.partnerProfile\.(\w+)\}/g,
-          (_, key) => data.partnerProfile[key] || ""
-        );
+    <div class="bill-to-section">
+      <div>
+        <div id="billing-details">
+          <p class="company-name-address-bill">Bill To</p>
+          <p class="company-name-bill">${data.orgProfile.billingName}</p>
+          <p class="company-name-address-bill">
+            ${data.orgProfile.addressLine1}
+          </p>
+          <p class="company-name-address-bill">
+            ${data.orgProfile.addressLine2}
+          </p>
+          <p class="company-name-address-bill">${data.orgProfile.city}</p>
+          <p class="company-name-address-bill">
+            ${data.orgProfile.state}
+            <span class="address-line">- ${data.orgProfile.pincode}</span>
+          </p>
+        </div>
+      </div>
+      <div class="invoice-header">
+        <table class="table">
+          <tr>
+            <th class="invoice-header-tablerow">Invoice #</th>
+            <td id="invoice-number" class="invoice-header-tablerow">
+              ${data.invoiceNo}
+            </td>
+          </tr>
+          <tr>
+            <th class="invoice-header-tablerow">Invoice Date</th>
+            <td id="invoice-date" class="invoice-header-tablerow">
+              ${data.invoiceDate}
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
 
-        // Replacing placeholders in billing details
-        const billingDetails = document.getElementById("billing-details");
-        billingDetails.innerHTML = billingDetails.innerHTML.replace(
-          /\$\{data\.orgProfile\.(\w+)\}/g,
-          (_, key) => data.orgProfile[key] || ""
-        );
+    <div class="table-container-main">
+      <table class="table">
+        <tbody id="items-table">
+          <!-- Items will be dynamically added here -->
+        </tbody>
+      </table>
+    </div>
 
-        // Replacing invoice details
-        document.getElementById("invoice-number").textContent = data.invoiceNo;
-        document.getElementById("invoice-date").textContent = data.invoiceDate;
+    <div class="total-data-container">
+      <div class="footer-section-back">
+        <p style="margin-bottom: 10px">
+          Thank you for the valued business<br />
+          and continued support.
+        </p>
 
-        // Dynamically populate the items table
-        const itemsTable = document.getElementById("items-table");
+        <p style="margin-top: 10px">Terms & Conditions</p>
+        <p>Invoice against the payment received.</p>
+      </div>
+      <div>
+        <div class="total" id="sub-total-divider">
+          <p>Sub Total</p>
+          <p id="sub-total">${data.subTotal}</p>
+        </div>
 
-        // Clear any existing rows in the table body
-        itemsTable.innerHTML = "";
+        <div id="tax-details" class="total-divider">
+        ${data.taxs
+          .map(
+            (item) => `<div class="total">
+    <p class="total-data">${item.taxName.toLocaleUpperCase()} (${
+              item.percentage
+            }%)</p>
+    <p id="${item.taxName.toLocaleUpperCase()}">${item.amount}</p>
+  </div>`
+          )
+          .join("")}
+        </div>
 
-        // Loop through each item and create a table row
-        data.items.forEach((item, index) => {
-          const row = document.createElement("tr");
+        <div class="total" id="grand-total-divider">
+          <p>Grand Total</p>
+          <p id="grand-total">${data.totalAmount}</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-report" style="display: flex; align-items: center; justify-content: center">
+      <div>
+        <p>Powered by</p>
+      </div>
+      <div class="footer-image">
+        <a href="https://emovur.com"><img id="footerLogo" src="${
+          data.partnerProfile.extra.logo
+        }" alt="Footer Logo" />
+        </a>
+      </div>
+      <div class="footer-slash">
+        <p>|</p>
+      </div>
+      <div class="footer-contact">
+        <div>
+          <i class="fa-regular fa-envelope"></i>
+        </div>
+        <div>
+          <a href="mailto: ${data.partnerProfile.extra.email}">
+            <p id="partnerEmail">support@emovur.com</p>
+          </a>
+        </div>
+        <div style="margin-left: 10px">
+          <i class="fa-solid fa-globe"></i>
+        </div>
+        <div>
+          <a href="${data.partnerProfile.extra.website}">
+            <p id="partnerWebsite">emovur.com</p>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
 
-          // Create each cell and append it to the row
-          const cell1 = document.createElement("td");
-          cell1.textContent = index + 1;
-          row.appendChild(cell1);
+  <script>
+    const data = ${JSON.stringify(data)};
 
-          const cell2 = document.createElement("td");
-          cell2.textContent = item.item;
-          row.appendChild(cell2);
+    function populatePlaceholders() {
+  // Replacing placeholders in company details
+  const companyDetails = document.getElementById("company-details");
+  companyDetails.innerHTML = companyDetails.innerHTML.replace(
+    /\$\{data\.partnerProfile\.(\w+)\}/g,
+    (_, key) => data.partnerProfile[key] || ""
+  );
 
-          const cell3 = document.createElement("td");
-          cell3.textContent = item.quantity;
-          row.appendChild(cell3);
+  // Replacing placeholders in billing details
+  const billingDetails = document.getElementById("billing-details");
+  billingDetails.innerHTML = billingDetails.innerHTML.replace(
+    /\$\{data\.orgProfile\.(\w+)\}/g,
+    (_, key) => data.orgProfile[key] || ""
+  );
 
-          const cell4 = document.createElement("td");
-          cell4.textContent = item.taxAmount;
-          row.appendChild(cell4);
+  // Replacing invoice details
+  document.getElementById("invoice-number").textContent = data.invoiceNo;
+  document.getElementById("invoice-date").textContent = data.invoiceDate;
 
-          const cell5 = document.createElement("td");
-          cell5.textContent = item.finalAmount;
-          row.appendChild(cell5);
+  // Dynamically populate the items table
+  const itemsTable = document.getElementById("items-table");
 
-          // Append the row to the table body
-          itemsTable.appendChild(row);
-        });
+  // Clear any existing rows in the table body
+  itemsTable.innerHTML = "";
 
-        // Populating totals
-        document.getElementById("sub-total").textContent = data.billing.amount;
-        document.getElementById("cgst").textContent = data.billing.tax;
-        // document.getElementById("sgst").textContent = data.billing.tax;
-        document.getElementById("grand-total").textContent =
-          data.billing.finalAmount;
-      }
+  // Loop through each item and create a table row
+  data.items.forEach((item, index) => {
+    const row = document.createElement("tr");
 
-      // Call the function to populate the placeholders
-      populatePlaceholders();
-    </script>
-  </body>
-</html>
-`;
+    // Apply background color to the first row
+    if (index === 0) {
+      row.style.backgroundColor = "#f0f0f0"; // Light gray color (you can change it)
+    }
+
+    // Create each cell and append it to the row
+    const cell1 = document.createElement("td");
+    cell1.textContent = item.key0;
+    row.appendChild(cell1);
+
+    const cell2 = document.createElement("td");
+    cell2.textContent = item.key1;
+    row.appendChild(cell2);
+
+    const cell3 = document.createElement("td");
+    cell3.textContent = item.key2;
+    cell3.style.textAlign = "right";
+    row.appendChild(cell3);
+
+    const cell4 = document.createElement("td");
+    cell4.textContent = item.key3;
+    cell4.style.textAlign = "right";
+    row.appendChild(cell4);
+
+    const cell5 = document.createElement("td");
+    cell5.textContent = item.key4;
+    cell5.style.textAlign = "right";
+    row.appendChild(cell5);
+
+    const cell6 = document.createElement("td");
+    cell6.innerHTML = item.key5;
+    cell6.style.textAlign = "right";
+    row.appendChild(cell6);
+
+    const cell7 = document.createElement("td");
+    cell7.innerHTML = item.key6;
+    cell7.style.textAlign = "right";
+    row.appendChild(cell7);
+
+    // Append the row to the table body
+    itemsTable.appendChild(row);
+  });
+
+  // Populating totals
+  document.getElementById("sub-total").textContent = data.subTotal;
+
+  document.getElementById("grand-total").textContent = data.totalAmount;
+  document.getElementById("partnerLogo").src = data.partnerProfile.extra.logo;
+  document.getElementById("footerLogo").src = data.partnerProfile.extra.logo;
+}
+populatePlaceholders();
+  </script>
+</body>
+</html>`;
 
 // Puppeteer pool configuration
 const browserPool = genericPool.createPool(
