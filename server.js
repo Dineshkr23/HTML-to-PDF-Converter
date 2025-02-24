@@ -1778,6 +1778,8 @@ const generatePDF = async (htmlContent) => {
 const handlePDFRequest = async (req, res, generateHTMLFunction) => {
   const data = req.body;
 
+  console.log(data);
+
   if (!data) {
     return res.status(400).json({ error: "JSON data is required" });
   }
