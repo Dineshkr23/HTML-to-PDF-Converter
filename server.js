@@ -1,5 +1,6 @@
 require("dotenv").config();
 const express = require("express");
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const fs = require("fs");
 const path = require("path");
@@ -18,6 +19,7 @@ if (!fs.existsSync(PDF_DIR)) {
 
 // Middleware to parse JSON payloads
 app.use(bodyParser.json());
+app.use(cors());
 
 // Custom middleware to handle raw text payloads for /html-text
 app.use("/html-text", bodyParser.text());
@@ -1778,7 +1780,7 @@ const generatePDF = async (htmlContent) => {
 const handlePDFRequest = async (req, res, generateHTMLFunction) => {
   const data = req.body;
 
-  console.log(data);
+  // console.log(data);
 
   if (!data) {
     return res.status(400).json({ error: "JSON data is required" });
