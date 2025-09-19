@@ -82,7 +82,7 @@ const generateGoogleReviewHTML = (data) => `
           padding: 30px;
         }
         .footer-report {
-          position: fixed;
+          position: static;
           bottom: 0;
           left: 0;
           right: 0;
@@ -398,9 +398,11 @@ const generateGoogleReviewHTML = (data) => `
         </div>
         <div><p id="partnerEmail">${data.partnerDetails.email}</p></div>
         <div style="margin-left: 10px"><i class="fa-solid fa-globe"></i></div>
-        <div><p id="partnerWebsite">${
-          data.partnerDetails.website ? data.partnerDetails.website : ""
-        }</p></div>
+        <div>
+          <p id="partnerWebsite">
+            ${data.partnerDetails.website ? data.partnerDetails.website : ""}
+          </p>
+        </div>
       </div>
     </div>
   </body>
